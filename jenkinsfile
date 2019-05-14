@@ -4,7 +4,6 @@ node {
   sh "mkdir -p output"
   
   writeFile file: "output/text.md", text: "This is my text in md :)"
-  
   writeFile file: "output/text.text", text: "This is my text in txt :)"
   
   stage "Archive build info"
