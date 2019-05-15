@@ -1,47 +1,50 @@
-def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger', 'UNSTABLE': 'danger', 'ABORTED': 'danger']
-def getBuildUser() {
-    return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-}
 pipeline {
-    environment {
-        //This variable need be tested as string
-        doError = '1'
-        BUILD_USER = ''
-    }
    
     agent any
     
     stages {
-        stage('Error') {
-            when {
-                expression { doError == '1' }
-            }
-            steps {
-                echo "Failure"
-                error "failure test. It's work"
+        stage('Stage 1'){
+            steps{
+                script{
+                    try {
+                        def causes = currentBuild.rawBuild.getCauses()
+                    } catch(err){
+                        slackSend channel: '#logs',
+                        color: 'danger',
+                        message: "Oof, error:\n${err}\nMore info at: ${env.BUILD_URL}"
+                    } finally {
+                        slackSend channel: '#logs',
+                        color: 'good',
+                        message: "Done with Stage 1!"  
+                    }
+                }
             }
         }
-        
-        stage('Success') {
-            when {
-                expression { doError == '0' }
-            }
-            steps {
-                echo "ok"
+        stage('Stage 2'){
+            steps{
+                script{
+                    try {
+                        def causes = currentBuild.rawBuild.getCausess()
+                    } catch(err){
+                        slackSend channel: '#logs',
+                        color: 'danger',
+                        message: "Oof, error:\n${err.getMessage()}\nMore info at: ${env.BUILD_URL}"
+                    } finally {
+                        slackSend channel: '#logs',
+                        color: 'good',
+                        message: "Done with Stage 2"  
+                    }
+                }
             }
         }
     }
 	post {
         always {
-            script {
-                BUILD_USER = getBuildUser()
-            }
-            echo 'I will always say Hello again!'
+            echo "Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
             
             slackSend channel: '#logs',
-                color: COLOR_MAP[currentBuild.currentResult],
-                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-            
+            color: 'danger',
+            message: "Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}"
         }
     }
 }
