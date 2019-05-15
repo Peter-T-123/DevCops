@@ -10,4 +10,6 @@ node {
   stage "Archive build info"
   
   archiveArtifacts artifacts: 'output/*.txt', excludes: 'output/*/md'
+  
+  slackSend color: 'good', message: 'All results green, no errors given back.'
 }
