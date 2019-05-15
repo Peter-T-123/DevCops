@@ -11,5 +11,13 @@ node {
   
   archiveArtifacts artifacts: 'output/*.txt', excludes: 'output/*/md'
   
-  slackSend(channel: "logs", color: 'good', message: 'All results green, no errors given back.')
+  def attachments = [
+    [
+      text: 'All results green, no errors given back.',
+       fallback: 'Error backend.',
+       color: '#ff0000'
+    ]
+  ]
+  
+  slackSend(channel: "#logs", attachments: attachments)
 }
