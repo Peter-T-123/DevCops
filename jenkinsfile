@@ -9,6 +9,7 @@ pipeline {
                     try {
                         def causes = currentBuild.rawBuild.getCauses()
                     } catch(err){
+		    
                         slackSend channel: '#logs',
                         color: 'danger',
                         message: "Oof, error:\n${err}\nMore info at: ${env.BUILD_URL}"
